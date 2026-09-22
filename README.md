@@ -2,18 +2,18 @@
 
 Task 1 -What doesn't match?
 
-I compared the API documentation with three responses provided. I found few places where the actual API behavior does not match what the documentation says.
+I compared the API documentation with three responses provided. I found a few places where the actual API behavior does not match what the documentation says.
 1. Pagination issue - the biggest problem
 
    The documentation says the has_more tells the client whether another page of orders is available. If it is true, the client should use next_cursor to get the next page.
    In orders_page1.json, however, has_more is false, while next_cursor contains cur_8f2a19bd. The README shows that the cursor was actually used to retrieve orders_page2.json, which contains two more orders.
-   This could cause a client to stop after page1 and never retrieve those two orders. page1 adds upto $249.94, while page 2 adds another $79.09. So an intergration following the documentation could silenlty incomplete numbers.
+   This could cause a client to stop after page1 and never retrieve those two orders. page1 adds up to $249.94, while page 2 adds another $79.09. So an integration following the documentation could silently incomplete numbers.
    I consider this the most serious issue because it can affect the whole dataset without causing an obvious error.
 
 2. Refunded is not documented as a status
 
    The documentation lists four possible statuses: pending, shipped, delivered, and cancelled.
-   But in orders_page2.json contains ord_1003 with status refunded.
+   But in orders_page2.json contains ord_1003 has status refunded.
    This could cause problem for a system that checks the status against the documented list. It is also important for finance because a refunded order may need to be treated differently from a normal completed order.
 
 3. Money is not always returned in the documented format
@@ -22,10 +22,10 @@ I compared the API documentation with three responses provided. I found few plac
    But in orders_page2.json, ord_1006 has:
    I.subtotal: 44.0
    II.tax: 3.63
-   III.shipping: 5.9
+   III.shipping: 5.99
    IV.total: 53.62
    The calculation itself is correct: $44.00 + $3.63 + $5.99 = $53.62. The problem is that the format does not follow the documentation.
-   This could be session for an integration expecting cents. For example, it might interpret 44.0 as 44 cents instead of $44.00
+   This could be issue for an integration expecting cents. For example, it might interpret 44.0 as 44 cents instead of $44.00
 
 4. Customer email can be missing
    
@@ -46,10 +46,10 @@ Adding the total field from all six captured orders gives:
 $328.03
 However, I would be careful about calling this the actual recognized revenue.
 One order, ord_1003, has a refunded status, but the API does not tell us how much was refunded or how refunds should be treated in the revenue calculation.
-There is also the pagination issue. If a client stopped after page 1 because has_more was false, it would calculate $249.94 and miss $79.90 from page 2.
-So my conculsion is: 
+There is also the pagination issue. If a client stopped after page 1 because has_more was false, it would calculate $249.94 and miss $79.09 from page 2.
+So my conclusion is: 
 Raw sum all captured order totals: $328.03.
-To calculate the actual revenue used by the dashboard, I would want to know how the dashboard treats refunded orders and whether these six orders represents the complete period being compared.
+To calculate the actual revenue used by the dashboard, I would want to know how the dashboard treats refunded orders and whether these six orders represent the complete period being compared.
 
 Task 3A - Reply to Priya
 
@@ -70,13 +70,13 @@ Task 3B - Bug report
 
 Title: Orders API reports has more=false when another page exists
 
-what I found: orders_page1.json returns has more=false but also provides next_cursor=cur_8f2a19bd. Using this cursor returns orders_page2.json, which contains two additional orders.
+What I found: orders_page1.json returns has more=false but also provides next_cursor=cur_8f2a19bd. Using this cursor returns orders_page2.json, which contains two additional orders.
 
-what should happen: has_more should be true whenever more orders are available, and next_cursor should be provided for the next request.
+What should happen: has_more should be true whenever more orders are available, and next_cursor should be provided for the next request.
 
-what happens now: The API tells clients to stop even though more orders exist.
+What happens now: The API tells clients to stop even though more orders exist.
 
 Impact: An integration following the documentation can silently miss orders and produce incorrect financial reports.
 
-what to check: Review the pagination logic that calculates has_more and next_cursor, especially the logic determining whether additional records remain.
+What to check: Review the pagination logic that calculates has_more and next_cursor, especially the logic determining whether additional records remain.
 
