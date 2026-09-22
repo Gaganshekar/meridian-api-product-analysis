@@ -87,6 +87,5 @@ Impact
 an integration following the documentation can silently miss orders and produce incorrect financial reports.
 
 what to check:
-
 Review the pagination logic that calculates has_more and next_cursor, especially the logic determining whether additional records remain.
 
