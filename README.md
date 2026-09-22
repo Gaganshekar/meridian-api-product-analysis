@@ -70,22 +70,13 @@ Task 3B - Bug report
 
 Title: Orders API reports has more=false when another page exists
 
-what I found:
+what I found: orders_page1.json returns has more=false but also provides next_cursor=cur_8f2a19bd. Using this cursor returns orders_page2.json, which contains two additional orders.
 
-orders_page1.json returns has more=false but also provides next_cursor=cur_8f2a19bd. Using this cursor returns orders_page2.json, which contains two additional orders.
+what should happen: has_more should be true whenever more orders are available, and next_cursor should be provided for the next request.
 
-what should happen:
+what happens now: The API tells clients to stop even though more orders exist.
 
-has_more should be true whenever more orders are available, and next_cursor should be provided for the next request.
+Impact: An integration following the documentation can silently miss orders and produce incorrect financial reports.
 
-what happens now:
-
-The API tells clients to stop even though more orders exist.
-
-Impact
-
-an integration following the documentation can silently miss orders and produce incorrect financial reports.
-
-what to check:
-Review the pagination logic that calculates has_more and next_cursor, especially the logic determining whether additional records remain.
+what to check: Review the pagination logic that calculates has_more and next_cursor, especially the logic determining whether additional records remain.
 
